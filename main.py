@@ -168,3 +168,35 @@ class Player:
                 CYAN,
                 [(x - 4, y + 17), (x, y + 17 + flame_h), (x + 4, y + 17)]
             )
+
+
+# the bullet
+class Bullet:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.speed = 10
+
+    @property
+    def rect(self):
+        return pygame.Rect(self.x - 2, self.y - 8, 4, 16)
+
+    def update(self):
+        self.y -= self.speed
+
+    def draw(self):
+        pygame.draw.line(
+            screen,
+            WHITE,
+            (int(self.x), int(self.y)),
+            (int(self.x), int(self.y + 12)),
+            3
+        )
+        pygame.draw.line(
+            screen,
+            PURPLE,
+            (int(self.x), int(self.y + 2)),
+            (int(self.x), int(self.y + 10)),
+            1
+        )
+
