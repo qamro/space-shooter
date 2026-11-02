@@ -346,7 +346,7 @@ while running:
                     enemies.remove(enemy)
 
 
-    # dRAW
+    # draw
     screen.fill(BG)
     draw_stars()
 
