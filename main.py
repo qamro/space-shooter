@@ -86,3 +86,85 @@ def draw_particles():
             int(p["size"])
         )
         screen.blit(surf, (p["x"] - 9, p["y"] - 9))
+        
+
+
+# the player
+class Player:
+    def __init__(self):
+        self.w = 38
+        self.h = 50
+        self.x = WIDTH // 2
+        self.y = HEIGHT - 80
+        self.speed = 6
+        self.cooldown = 0
+        self.alive = True
+
+    @property
+    def rect(self):
+        return pygame.Rect(
+            self.x - self.w // 2,
+            self.y - self.h // 2,
+            self.w,
+            self.h
+        )
+
+    def update(self, keys):
+        if not self.alive:
+            return
+
+        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+            self.x -= self.speed
+        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+            self.x += self.speed
+        if keys[pygame.K_UP] or keys[pygame.K_w]:
+            self.y -= self.speed
+        if keys[pygame.K_DOWN] or keys[pygame.K_s]:
+            self.y += self.speed
+
+        self.x = max(self.w // 2, min(WIDTH - self.w // 2, self.x))
+        self.y = max(80, min(HEIGHT - self.h // 2 - 8, self.y))
+
+        if self.cooldown > 0:
+            self.cooldown -= 1
+
+    def shoot(self):
+        if self.alive and self.cooldown <= 0:
+            bullets.append(Bullet(self.x - 7, self.y - 28))
+            bullets.append(Bullet(self.x + 7, self.y - 28))
+            self.cooldown = 10
+
+    def draw(self):
+        x, y = int(self.x), int(self.y)
+
+        # engine glow
+        glow = pygame.Surface((80, 90), pygame.SRCALPHA)
+        pygame.draw.circle(glow, (110, 60, 255, 40), (40, 45), 34)
+        screen.blit(glow, (x - 40, y - 38))
+
+        # ship body
+        pygame.draw.polygon(
+            screen,
+            WHITE,
+            [(x, y - 26), (x - 17, y + 18), (x, y + 10), (x + 17, y + 18)],
+            2
+        )
+        pygame.draw.polygon(
+            screen,
+            PURPLE,
+            [(x, y - 22), (x - 8, y + 12), (x, y + 7), (x + 8, y + 12)],
+            2
+        )
+
+        # wings
+        pygame.draw.line(screen, WHITE, (x - 17, y + 17), (x - 25, y + 25), 2)
+        pygame.draw.line(screen, WHITE, (x + 17, y + 17), (x + 25, y + 25), 2)
+
+        # flame
+        if self.alive:
+            flame_h = random.randint(8, 18)
+            pygame.draw.polygon(
+                screen,
+                CYAN,
+                [(x - 4, y + 17), (x, y + 17 + flame_h), (x + 4, y + 17)]
+            )
