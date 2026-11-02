@@ -23,3 +23,25 @@ CYAN = (80, 220, 255)
 RED = (255, 70, 110)
 PINK = (255, 90, 210)
 YELLOW = (255, 220, 90)
+
+
+# stars
+stars = []
+for _ in range(90):
+    stars.append([
+        random.randint(0, WIDTH),
+        random.randint(0, HEIGHT),
+        random.choice([1, 1, 1, 2]),
+        random.uniform(0.4, 1.5)
+    ])
+
+def update_stars():
+    for s in stars:
+        s[1] += s[3]
+        if s[1] > HEIGHT:
+            s[0] = random.randint(0, WIDTH)
+            s[1] = 0
+
+def draw_stars():
+    for x, y, r, _ in stars:
+        pygame.draw.circle(screen, (150, 140, 210), (int(x), int(y)), r)
