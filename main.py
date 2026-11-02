@@ -200,3 +200,40 @@ class Bullet:
             1
         )
 
+
+
+# the enemy
+class Enemy:
+    def __init__(self):
+        self.x = random.randint(35, WIDTH - 35)
+        self.y = random.randint(-220, -40)
+        self.size = random.randint(18, 25)
+        self.speed = random.uniform(1.7, 3.2)
+        self.phase = random.uniform(0, math.tau)
+
+    @property
+    def rect(self):
+        s = self.size
+        return pygame.Rect(self.x - s, self.y - s, s * 2, s * 2)
+
+    def update(self):
+        self.y += self.speed
+        self.phase += 0.06
+        self.x += math.sin(self.phase) * 0.6
+
+    def draw(self):
+        x, y, s = int(self.x), int(self.y), self.size
+
+        # neon triangle
+        points = [
+            (x, y + s),
+            (x - s, y - s),
+            (x + s, y - s)
+        ]
+        pygame.draw.polygon(screen, RED, points, 3)
+
+        # inner glow/core
+        pygame.draw.circle(screen, PINK, (x, y), 3)
+
+
+
