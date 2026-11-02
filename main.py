@@ -237,3 +237,20 @@ class Enemy:
 
 
 
+# game state
+player = Player()
+bullets = []
+enemies = []
+score = 0
+game_over = False
+spawn_timer = 0
+
+def reset_game():
+    global player, bullets, enemies, particles, score, game_over, spawn_timer
+    player = Player()
+    bullets = []
+    enemies = []
+    particles = []
+    score = 0
+    game_over = False
+    spawn_timer = 0
