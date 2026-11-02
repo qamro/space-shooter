@@ -292,7 +292,7 @@ while running:
         player.shoot()
 
 
-    # UPDATE
+    # update
     update_stars()
     update_particles()
 
