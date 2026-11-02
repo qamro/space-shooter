@@ -254,3 +254,132 @@ def reset_game():
     score = 0
     game_over = False
     spawn_timer = 0
+    
+
+
+
+# main loop
+
+running = True
+
+while running:
+    dt = clock.tick(FPS)
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                running = False
+
+            if event.key == pygame.K_SPACE and not game_over:
+                player.shoot()
+
+            if event.key == pygame.K_r and game_over:
+                reset_game()
+
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if not game_over:
+                player.shoot()
+            else:
+                reset_game()
+
+    keys = pygame.key.get_pressed()
+
+    # hold space for continuous fire
+    if keys[pygame.K_SPACE] and not game_over:
+        player.shoot()
+
+
+    # UPDATE
+    update_stars()
+    update_particles()
+
+    if not game_over:
+        player.update(keys)
+
+        spawn_timer += 1
+        spawn_delay = max(20, 48 - score // 50)
+
+        if spawn_timer >= spawn_delay:
+            enemies.append(Enemy())
+            spawn_timer = 0
+
+        for bullet in bullets[:]:
+            bullet.update()
+            if bullet.y < -20:
+                bullets.remove(bullet)
+
+        for enemy in enemies[:]:
+            enemy.update()
+
+            if enemy.y > HEIGHT + 40:
+                enemies.remove(enemy)
+                continue
+
+            # bullet/enemy collision
+            hit = None
+            for bullet in bullets:
+                if enemy.rect.colliderect(bullet.rect):
+                    hit = bullet
+                    break
+
+            if hit:
+                if hit in bullets:
+                    bullets.remove(hit)
+                if enemy in enemies:
+                    enemies.remove(enemy)
+
+                score += 10
+                spawn_explosion(enemy.x, enemy.y, RED, 24)
+                continue
+
+            # enemy/player collision
+            if enemy.rect.colliderect(player.rect):
+                player.alive = False
+                game_over = True
+                spawn_explosion(player.x, player.y, PURPLE, 45)
+                spawn_explosion(enemy.x, enemy.y, RED, 35)
+
+                if enemy in enemies:
+                    enemies.remove(enemy)
+
+
+    # dRAW
+    screen.fill(BG)
+    draw_stars()
+
+    # decorative horizon line
+    pygame.draw.line(screen, PURPLE, (0, HEIGHT - 25), (WIDTH, HEIGHT - 25), 2)
+
+    for bullet in bullets:
+        bullet.draw()
+
+    for enemy in enemies:
+        enemy.draw()
+
+    if player.alive:
+        player.draw()
+
+    draw_particles()
+
+    score_text = FONT.render(f"SCORE: {score}", True, WHITE)
+    screen.blit(score_text, (WIDTH // 2 - score_text.get_width() // 2, 18))
+
+    if game_over:
+        title = FONT.render("GAME OVER", True, RED)
+        info = SMALL.render("Press R or click to restart", True, WHITE)
+
+        screen.blit(
+            title,
+            (WIDTH // 2 - title.get_width() // 2, HEIGHT // 2 - 30)
+        )
+        screen.blit(
+            info,
+            (WIDTH // 2 - info.get_width() // 2, HEIGHT // 2 + 10)
+        )
+
+    pygame.display.flip()
+
+pygame.quit()
